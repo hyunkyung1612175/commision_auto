@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>시상율 자동변환 — INCAR 생보관리팀</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Noto+Sans+KR:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<style>
+:root {
+  --bg:      #03080f;
+  --s1:      #070d17;
+  --s2:      #0b1220;
+  --s3:      #0f1829;
+  --border:  rgba(56,139,253,0.12);
+  --border2: rgba(56,139,253,0.22);
+  --b:       #388bfd;
+  --b-glow:  rgba(56,139,253,0.18);
+  --b-dim:   rgba(56,139,253,0.08);
+  --gold:    #f0c142;
+  --gold-d:  rgba(240,193,66,0.14);
+  --green:   #3fb950;
+  --green-d: rgba(63,185,80,0.12);
+  --red:     #ff6b6b;
+  --red-d:   rgba(255,107,107,0.12);
+  --t1:      #e6edf3;
+  --t2:      #7d8590;
+  --t3:      #3a4455;
+  --r:       14px;
+  --rL:      22px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100%;background:var(--bg);}
+body{font-family:'Noto Sans KR',sans-serif;color:var(--t1);font-size:14px;
+  display:flex;flex-direction:column;align-items:center;padding:60px 20px 100px;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%,rgba(56,139,253,0.12),transparent),
+    radial-gradient(ellipse 40% 30% at 90% 80%,rgba(240,193,66,0.05),transparent);
+}
+
+/* ── HEADER ─────────────────────────────── */
+.wrap{width:100%;max-width:660px;position:relative;}
+
+header{text-align:center;margin-bottom:56px;position:relative;}
+
+.h-eyebrow{display:inline-flex;align-items:center;gap:8px;margin-bottom:20px;
+  background:rgba(56,139,253,0.08);border:1px solid var(--border2);
+  border-radius:100px;padding:5px 16px 5px 10px;}
+.h-eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--b);
+  box-shadow:0 0 10px var(--b);animation:blink 2s ease-in-out infinite;}
+.h-eyebrow span{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--b);}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.35;}}
+
+.h-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;
+  letter-spacing:-.04em;line-height:1.1;margin-bottom:14px;color:var(--t1);}
+.h-title em{font-style:normal;}
+
+.h-desc{font-size:14px;color:var(--t2);line-height:1.7;max-width:440px;margin:0 auto;}
+
+/* ── STEP INDICATOR ─────────────────────── */
+.steps{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:44px;}
+.step-item{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.step-num{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border2);
+  background:var(--s2);display:flex;align-items:center;justify-content:center;
+  font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--t3);
+  transition:all .4s;}
+.step-num.active{border-color:var(--b);color:var(--b);background:var(--b-dim);
+  box-shadow:0 0 16px rgba(56,139,253,0.3);}
+.step-num.done{border-color:var(--green);color:var(--green);background:var(--green-d);}
+.step-label{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--t3);transition:color .4s;}
+.step-label.active{color:var(--b);}
+.step-label.done{color:var(--green);}
+.step-line{width:60px;height:1px;background:var(--border);margin:0 4px;margin-bottom:22px;
+  transition:background .4s;}
+.step-line.done{background:var(--green);}
+
+/* ── CARD ───────────────────────────────── */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--rL);
+  padding:36px;box-shadow:0 0 80px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.04);}
+
+/* ── UPLOAD ZONE ─────────────────────────── */
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--r);padding:44px 28px;
+  text-align:center;cursor:pointer;position:relative;transition:all .25s;
+  background:var(--s2);}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--b);background:var(--b-dim);}
+.upload-zone.drag{box-shadow:0 0 40px rgba(56,139,253,0.15);}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.uz-ico{font-size:36px;margin-bottom:14px;display:block;
+  filter:drop-shadow(0 0 20px rgba(56,139,253,0.4));}
+.uz-title{font-size:16px;font-weight:700;margin-bottom:6px;color:var(--t1);}
+.uz-hint{font-size:12px;color:var(--t2);margin-bottom:0;}
+.uz-types{display:flex;gap:6px;justify-content:center;margin-top:12px;}
+.uz-tag{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;
+  padding:3px 10px;border-radius:100px;background:var(--b-dim);border:1px solid var(--border2);color:var(--b);}
+
+/* FILLED STATE */
+.upload-zone.filled{border-style:solid;border-color:var(--green);background:var(--green-d);}
+.upload-zone.filled .uz-ico{filter:drop-shadow(0 0 20px rgba(63,185,80,0.4));}
+.uz-file{font-family:'DM Mono',monospace;font-size:11px;color:var(--green);
+  margin-top:10px;display:none;word-break:break-all;}
+.upload-zone.filled .uz-file{display:block;}
+.upload-zone.filled .uz-hint,.upload-zone.filled .uz-types{display:none;}
+
+/* ── RATE CONTROL ───────────────────────── */
+.rate-row{display:flex;align-items:center;gap:16px;margin:28px 0;
+  background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:18px 22px;}
+.rate-row label{font-size:13px;font-weight:600;color:var(--t2);flex-shrink:0;}
+.rate-slider-wrap{flex:1;position:relative;display:flex;align-items:center;gap:12px;}
+input[type=range]{-webkit-appearance:none;flex:1;height:4px;border-radius:2px;outline:none;cursor:pointer;
+  background:linear-gradient(to right,var(--b) var(--val,70%),var(--s3) var(--val,70%));}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+  background:var(--b);border:2px solid #fff;box-shadow:0 0 12px rgba(56,139,253,0.5);cursor:pointer;}
+.rate-val{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--gold);
+  min-width:48px;text-align:right;}
+.rate-desc{font-size:11px;color:var(--t3);margin-left:auto;}
+
+/* ── BUTTON ─────────────────────────────── */
+.btn{width:100%;padding:16px;border:none;border-radius:var(--r);font-family:'Noto Sans KR',sans-serif;
+  font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:-.01em;}
+.btn-primary{background:linear-gradient(135deg,#1d62e8,#388bfd);color:#fff;
+  box-shadow:0 4px 24px rgba(56,139,253,0.4);}
+.btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 32px rgba(56,139,253,0.5);}
+.btn-primary:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none;}
+.btn-dl{background:transparent;color:var(--green);border:1.5px solid var(--green);
+  margin-top:12px;display:none;box-shadow:0 0 0 rgba(63,185,80,0);}
+.btn-dl:hover{background:var(--green-d);box-shadow:0 0 24px rgba(63,185,80,0.2);}
+
+/* ── PROGRESS ───────────────────────────── */
+.progress-wrap{margin-top:20px;display:none;}
+.progress-label{font-size:12px;color:var(--t2);margin-bottom:8px;display:flex;justify-content:space-between;}
+.progress-bar{height:4px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:2px;width:0%;
+  background:linear-gradient(90deg,var(--b),#60a5fa);transition:width .3s ease;}
+.progress-log{margin-top:8px;font-family:'DM Mono',monospace;font-size:11px;color:var(--t3);
+  height:16px;overflow:hidden;}
+
+/* ── STATUS ─────────────────────────────── */
+.status{display:none;align-items:center;gap:12px;padding:14px 18px;
+  border-radius:10px;font-size:13px;font-weight:500;margin-top:16px;}
+.status.ok{display:flex;background:var(--green-d);border:1px solid rgba(63,185,80,.3);color:var(--green);}
+.status.err{display:flex;background:var(--red-d);border:1px solid rgba(255,107,107,.3);color:var(--red);}
+.status-icon{font-size:16px;flex-shrink:0;}
+
+/* ── STATS ──────────────────────────────── */
+.stats{display:none;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px;}
+.stats.show{display:grid;}
+.stat-box{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);
+  padding:16px;text-align:center;}
+.stat-val{font-family:'DM Mono',monospace;font-size:26px;font-weight:500;color:var(--b);display:block;}
+.stat-val.gold{color:var(--gold);}
+.stat-val.green{color:var(--green);}
+.stat-lbl{font-size:11px;color:var(--t3);margin-top:3px;}
+
+/* ── HIGHLIGHT PREVIEW ────────────────────*/
+.preview-section{margin-top:28px;display:none;}
+.preview-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.preview-hd h3{font-size:14px;font-weight:700;}
+.preview-badge{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;
+  padding:3px 10px;border-radius:100px;background:var(--gold-d);
+  border:1px solid rgba(240,193,66,0.3);color:var(--gold);}
+.preview-list{display:flex;flex-direction:column;gap:6px;max-height:240px;overflow-y:auto;}
+.preview-item{display:flex;align-items:center;gap:10px;padding:10px 14px;
+  background:var(--s2);border:1px solid var(--border);border-radius:10px;font-size:12px;}
+.pi-page{font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);min-width:48px;}
+.pi-orig{font-family:'DM Mono',monospace;color:var(--t2);text-decoration:line-through;}
+.pi-arrow{color:var(--t3);}
+.pi-new{font-family:'DM Mono',monospace;color:var(--green);font-weight:600;}
+.pi-hl{font-size:10px;padding:2px 8px;border-radius:100px;background:rgba(240,193,66,0.15);
+  border:1px solid rgba(240,193,66,0.3);color:var(--gold);margin-left:auto;}
+
+/* ── DIVIDER ────────────────────────────── */
+.divider{height:1px;background:var(--border);margin:28px 0;}
+
+/* ── TOAST / POPUP ──────────────────────── */
+.toast-wrap{position:fixed;top:28px;right:28px;z-index:9999;display:flex;flex-direction:column;gap:10px;}
+.toast{display:flex;align-items:center;gap:12px;padding:14px 20px;border-radius:14px;
+  font-size:13px;font-weight:600;backdrop-filter:blur(16px);
+  box-shadow:0 8px 32px rgba(0,0,0,0.5);animation:toastIn .35s cubic-bezier(.34,1.56,.64,1);}
+.toast.hi{background:rgba(240,193,66,0.15);border:1px solid rgba(240,193,66,0.4);color:var(--gold);}
+.toast.ok{background:rgba(63,185,80,0.15);border:1px solid rgba(63,185,80,0.4);color:var(--green);}
+.toast.err{background:rgba(255,107,107,0.15);border:1px solid rgba(255,107,107,0.4);color:var(--red);}
+@keyframes toastIn{from{opacity:0;transform:translateY(-12px) scale(.95);}to{opacity:1;transform:none;}}
+@keyframes toastOut{to{opacity:0;transform:translateY(-8px);}}
+
+/* ── FOOTER ─────────────────────────────── */
+footer{margin-top:44px;font-size:12px;color:var(--t3);text-align:center;
+  font-family:'DM Mono',monospace;letter-spacing:.05em;}
+
+/* ── SCROLLBAR ──────────────────────────── */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--t3);border-radius:4px;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="h-eyebrow">
+      <div class="dot"></div>
+      <span>INCAR 생보관리팀 자동화</span>
+    </div>
+    <h1 class="h-title">시상율 자동변환</h1>
+    <p class="h-desc">
+      시상안 원본 → 하이라이트 → 70% 자동적용
+    </p>
+  </header>
+
+  <!-- STEP INDICATOR -->
+  <div class="steps" id="stepRow">
+    <div class="step-item">
+      <div class="step-num active" id="sn1">1</div>
+      <div class="step-label active" id="sl1">업로드</div>
+    </div>
+    <div class="step-line" id="sl12"></div>
+    <div class="step-item">
+      <div class="step-num" id="sn2">2</div>
+      <div class="step-label" id="sl2">감지</div>
+    </div>
+    <div class="step-line" id="sl23"></div>
+    <div class="step-item">
+      <div class="step-num" id="sn3">3</div>
+      <div class="step-label" id="sl3">변환</div>
+    </div>
+    <div class="step-line" id="sl34"></div>
+    <div class="step-item">
+      <div class="step-num" id="sn4">4</div>
+      <div class="step-label" id="sl4">완료</div>
+    </div>
+  </div>
+
+  <!-- MAIN CARD -->
+  <div class="card">
+
+    <!-- STEP 1: UPLOAD -->
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" id="fileInput" accept=".pdf">
+      <span class="uz-ico">📄</span>
+      <div class="uz-title">시상안 PDF를 올려주세요</div>
+      <div class="uz-hint">클릭하거나 드래그&드롭</div>
+      <div class="uz-types">
+        <span class="uz-tag">PDF</span>
+      </div>
+      <div class="uz-file" id="uz-file-name"></div>
+    </div>
+
+    <!-- STEP 2: RATE CONTROL -->
+    <div class="rate-row" id="rateRow" style="display:none">
+      <label>적용 비율</label>
+      <div class="rate-slider-wrap">
+        <input type="range" id="rateSlider" min="10" max="100" step="1" value="70"
+          oninput="updateRate(this.value)">
+        <div class="rate-val" id="rateVal">70%</div>
+      </div>
+    </div>
+
+    <!-- DETECT BUTTON -->
+    <button class="btn btn-primary" id="detectBtn" disabled style="margin-top:24px">
+      🔍 % 숫자 자동 감지 · 하이라이트
+    </button>
+
+    <!-- PROGRESS -->
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-label">
+        <span id="progressMsg">처리 중...</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-log" id="progressLog"></div>
+    </div>
+
+    <!-- HIGHLIGHT PREVIEW -->
+    <div class="preview-section" id="previewSection">
+      <div class="preview-hd">
+        <h3>감지된 % 숫자 목록</h3>
+        <span class="preview-badge" id="previewBadge">0건</span>
+      </div>
+      <div class="preview-list" id="previewList"></div>
+    </div>
+
+    <!-- DIVIDER + CONVERT -->
+    <div id="convertArea" style="display:none">
+      <div class="divider"></div>
+      <button class="btn btn-primary" id="convertBtn">
+        ✨ <span id="convertLabel">70%</span> 변환 실행
+      </button>
+    </div>
+
+    <!-- STATUS -->
+    <div class="status" id="statusBox">
+      <span class="status-icon" id="statusIcon"></span>
+      <span id="statusText"></span>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats" id="statsBox">
+      <div class="stat-box">
+        <span class="stat-val" id="statPages">0</span>
+        <div class="stat-lbl">수정된 페이지</div>
+      </div>
+      <div class="stat-box">
+        <span class="stat-val gold" id="statItems">0</span>
+        <div class="stat-lbl">감지된 % 숫자</div>
+      </div>
+      <div class="stat-box">
+        <span class="stat-val green" id="statDone">0</span>
+        <div class="stat-lbl">치환 완료</div>
+      </div>
+    </div>
+
+    <!-- DOWNLOAD -->
+    <button class="btn btn-dl" id="dlBtn">⬇ 변환된 PDF 다운로드</button>
+
+  </div>
+
+  <footer>인카금융서비스 제도관리부 생보관리팀</footer>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+// ── PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ── 상수
+const ERASE_INSET      = 0.8;
+const PERCENT_SEARCH_X = 70.0;
+const PERCENT_GAP      = 0.5;
+
+// 숫자 패턴: 정수 or 소수 (쉼표 포함)
+const NUM_PAT = /(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?/g;
+
+// % 뒤에 숫자가 오는 패턴 (단가 숫자 제외를 위해 % 바로 앞뒤 context 활용)
+// 전략: 텍스트 아이템에서 숫자 뒤 같은 아이템 or 인접 아이템에 % 가 있으면 "% 숫자"로 판별
+
+// ── Canvas 너비 측정
+const _mc  = document.createElement('canvas');
+const _mct = _mc.getContext('2d');
+function measureW(str, fs) {
+  _mct.font = `${fs}px Helvetica`;
+  return _mct.measureText(str).width;
+}
+
+// ── 유틸
+function calcNew(numStr, rate) {
+  const hasComma = numStr.includes(',');
+  const v = parseFloat(numStr.replace(/,/g, ''));
+  const result = Math.floor(v * rate);
+  return hasComma ? result.toLocaleString('en-US') : String(result);
+}
+function overlap(ax0,ay0,ax1,ay1,bx0,by0,bx1,by1) {
+  return ax0<bx1&&ax1>bx0&&ay0<by1&&ay1>by0;
+}
+function inset(x0,y0,x1,y1,d) {
+  const nx0=x0+d,ny0=y0+d,nx1=x1-d,ny1=y1-d;
+  if(nx1<=nx0||ny1<=ny0) return [x0,y0,x1,y1];
+  return [nx0,ny0,nx1,ny1];
+}
+
+// ── 상태 변수
+let pdfFile    = null;
+let pdfName    = '';
+let detectedItems = [];  // { page, origNum, newNum, item, isPct, x0,y0,x1,y1 }
+let resultBlob = null;
+let currentRate = 0.70;
+
+// ── UI 요소
+const fileInput    = document.getElementById('fileInput');
+const uploadZone   = document.getElementById('uploadZone');
+const detectBtn    = document.getElementById('detectBtn');
+const convertBtn   = document.getElementById('convertBtn');
+const dlBtn        = document.getElementById('dlBtn');
+const rateRow      = document.getElementById('rateRow');
+const rateSlider   = document.getElementById('rateSlider');
+const rateVal      = document.getElementById('rateVal');
+const progressWrap = document.getElementById('progressWrap');
+const progressFill = document.getElementById('progressFill');
+const progressMsg  = document.getElementById('progressMsg');
+const progressPct  = document.getElementById('progressPct');
+const progressLog  = document.getElementById('progressLog');
+const previewSection = document.getElementById('previewSection');
+const previewList  = document.getElementById('previewList');
+const previewBadge = document.getElementById('previewBadge');
+const convertArea  = document.getElementById('convertArea');
+const statusBox    = document.getElementById('statusBox');
+const statsBox     = document.getElementById('statsBox');
+
+// ── 비율 슬라이더
+function updateRate(v) {
+  currentRate = v / 100;
+  rateVal.textContent = v + '%';
+  rateSlider.style.setProperty('--val', v + '%');
+  document.getElementById('convertLabel').textContent = v + '%';
+  // 미리보기 갱신
+  if (detectedItems.length) refreshPreview();
+}
+updateRate(70);
+
+// ── 파일 업로드
+function setupUpload() {
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) onFile(fileInput.files[0]);
+  });
+  uploadZone.addEventListener('dragover', e => {
+    e.preventDefault(); uploadZone.classList.add('drag');
+  });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag'));
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault(); uploadZone.classList.remove('drag');
+    const f = e.dataTransfer.files[0];
+    if (f && f.name.toLowerCase().endsWith('.pdf')) onFile(f);
+  });
+}
+setupUpload();
+
+function onFile(f) {
+  pdfFile = f;
+  pdfName = f.name;
+  document.getElementById('uz-file-name').textContent = f.name;
+  uploadZone.classList.add('filled');
+  uploadZone.querySelector('.uz-ico').textContent = '✅';
+  detectBtn.disabled = false;
+  rateRow.style.display = 'flex';
+  resetResults();
+  setStep(1);
+}
+
+function resetResults() {
+  detectedItems = [];
+  resultBlob = null;
+  previewSection.style.display = 'none';
+  convertArea.style.display = 'none';
+  statusBox.className = 'status';
+  statsBox.className = 'stats';
+  dlBtn.style.display = 'none';
+  progressWrap.style.display = 'none';
+}
+
+// ── 단계 표시
+function setStep(n) {
+  for (let i=1;i<=4;i++) {
+    const num = document.getElementById('sn'+i);
+    const lbl = document.getElementById('sl'+i);
+    if (i < n) { num.className='step-num done'; lbl.className='step-label done'; num.textContent='✓'; }
+    else if (i===n) { num.className='step-num active'; lbl.className='step-label active'; }
+    else { num.className='step-num'; lbl.className='step-label'; }
+    if (i<4) {
+      document.getElementById('sl'+i+(i+1)).className = 'step-line' + (i<n?' done':'');
+    }
+  }
+}
+
+// ── 진행 상태
+function setProgress(pct, msg, log='') {
+  progressFill.style.width = pct + '%';
+  progressMsg.textContent = msg;
+  progressPct.textContent = Math.round(pct) + '%';
+  if (log) progressLog.textContent = log;
+}
+
+// ── STEP 2: % 숫자 자동 감지
+detectBtn.addEventListener('click', async () => {
+  if (!pdfFile) return;
+  detectBtn.disabled = true;
+  resetResults();
+  progressWrap.style.display = 'block';
+  setStep(2);
+  setProgress(0, 'PDF 읽는 중...');
+
+  try {
+    const buf = await pdfFile.arrayBuffer();
+    const u8  = new Uint8Array(buf);
+    const doc = await pdfjsLib.getDocument({ data: u8 }).promise;
+    const total = doc.numPages;
+    detectedItems = [];
+
+    for (let pno = 1; pno <= total; pno++) {
+      const pct = (pno / total) * 80;
+      setProgress(pct, `페이지 ${pno}/${total} 분석 중`, `P.${pno} 텍스트 추출...`);
+
+      const page = await doc.getPage(pno);
+      const tc   = await page.getTextContent({ normalizeWhitespace: false });
+
+      // 모든 텍스트 아이템 정규화
+      const items = tc.items
+        .filter(it => it.str && it.str.trim())
+        .map(it => {
+          const [a,b,,, e, f] = it.transform;
+          const fs  = Math.abs(it.height) || Math.hypot(a,b) || 10;
+          const iw  = Math.abs(it.width);
+          const asc = fs * 0.82;
+          const des = fs * 0.20;
+          return { text:it.str, x0:e, x1:e+iw, baseline:f, y0:f-des, y1:f+asc, fs, iw };
+        });
+
+      // % 아이템 위치 수집
+      const pctItems = items.filter(it => {
+        const t = it.text.replace(/\s/g,'');
+        return t==='%' || t==='％' || it.text.includes('%') || it.text.includes('％');
+      });
+
+      // 각 숫자 아이템 검사
+      for (const item of items) {
+        const numMatches = [...item.text.matchAll(new RegExp(NUM_PAT.source, 'g'))];
+        if (!numMatches.length) continue;
+
+        const totalMW = measureW(item.text, item.fs) || 1;
+
+        for (const m of numMatches) {
+          const origNum = m[0];
+          const v = parseFloat(origNum.replace(/,/g,''));
+          // 숫자 범위 필터: 0~999 사이의 % 숫자일 가능성 높은 것만
+          // (단가/금액 숫자는 보통 1000 이상이므로 쉼표 있으면 제외하는 옵션도 고려)
+          // 여기서는 % 기호와의 근접성으로만 판단
+
+          const mStart = m.index;
+          const mEnd   = mStart + origNum.length;
+          const preMW  = measureW(item.text.substring(0, mStart), item.fs);
+          const numMW  = measureW(origNum, item.fs);
+          const numX0  = item.x0 + (preMW / totalMW) * item.iw;
+          const numX1  = numX0 + (numMW / totalMW) * item.iw;
+
+          // ① 같은 텍스트 아이템 안에 % 포함?
+          const after    = item.text.substring(mEnd);
+          const samePct  = after.match(/^(\s*)([%％])/);
+          // ② 또는 텍스트 자체가 "숫자%" 형태?
+          const selfPct  = item.text.match(/\d[%％]/);
+
+          let isPct = !!(samePct || selfPct);
+
+          // ③ 인접 % 아이템 탐색
+          if (!isPct) {
+            for (const pi of pctItems) {
+              if (pi === item) continue;
+              const yOv  = Math.min(item.y1, pi.y1) - Math.max(item.y0, pi.y0);
+              const minH = Math.min(item.y1-item.y0, pi.y1-pi.y0);
+              if (minH<=0 || yOv/minH < 0.5) continue;
+              // % 기호가 숫자 바로 오른쪽에 있어야
+              if (pi.x0 >= numX1 - 2 && pi.x0 <= numX1 + PERCENT_SEARCH_X) {
+                isPct = true; break;
+              }
+            }
+          }
+
+          if (!isPct) continue;
+
+          const newNum = calcNew(origNum, currentRate);
+          detectedItems.push({
+            page: pno,
+            origNum, newNum,
+            item,
+            numX0, numX1,
+            y0: item.y0, y1: item.y1,
+            baseline: item.baseline,
+            fs: item.fs,
+            iw: item.iw,
+            totalMW,
+          });
+        }
+      }
+    }
+
+    setProgress(90, '하이라이트 목록 생성 중...');
+    await new Promise(r => setTimeout(r, 100));
+
+    setProgress(100, '감지 완료!');
+    progressWrap.style.display = 'none';
+
+    if (detectedItems.length === 0) {
+      showToast('err', '⚠ 감지된 % 숫자가 없습니다');
+      detectBtn.disabled = false;
+      setStep(1);
+      return;
+    }
+
+    refreshPreview();
+    previewSection.style.display = 'block';
+    convertArea.style.display = 'block';
+    setStep(3);
+
+    showToast('hi', `✨ ${detectedItems.length}건 감지 완료 — 하이라이트 적용됨`);
+    detectBtn.disabled = false;
+
+  } catch(err) {
+    console.error(err);
+    setProgress(0, '오류 발생');
+    progressWrap.style.display = 'none';
+    showToast('err', '오류: ' + err.message);
+    detectBtn.disabled = false;
+    setStep(1);
+  }
+});
+
+// ── 미리보기 목록 갱신
+function refreshPreview() {
+  const rate = currentRate;
+  previewBadge.textContent = detectedItems.length + '건';
+  previewList.innerHTML = detectedItems.map((d, i) => {
+    const newNum = calcNew(d.origNum, rate);
+    return `<div class="preview-item">
+      <span class="pi-page">P.${d.page}</span>
+      <span class="pi-orig">${d.origNum}%</span>
+      <span class="pi-arrow">→</span>
+      <span class="pi-new">${newNum}%</span>
+      <span class="pi-hl">🟡 하이라이트</span>
+    </div>`;
+  }).join('');
+}
+
+// ── STEP 3: 변환 실행
+convertBtn.addEventListener('click', async () => {
+  if (!pdfFile || !detectedItems.length) return;
+  convertBtn.disabled = true;
+  dlBtn.style.display = 'none';
+  statsBox.className = 'stats';
+  statusBox.className = 'status';
+  progressWrap.style.display = 'block';
+  setProgress(0, '변환 준비 중...');
+  setStep(3);
+
+  try {
+    const rate = currentRate;
+    const buf  = await pdfFile.arrayBuffer();
+    const u8   = new Uint8Array(buf);
+
+    setProgress(10, 'PDF 로드 중...');
+    const pdfDoc = await PDFLib.PDFDocument.load(u8);
+    const font   = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+
+    // 페이지별로 그룹화
+    const byPage = {};
+    detectedItems.forEach(d => {
+      if (!byPage[d.page]) byPage[d.page] = [];
+      byPage[d.page].push(d);
+    });
+
+    const pages = Object.keys(byPage).map(Number);
+    let changedPages = 0;
+    let replaced = 0;
+
+    for (let pi = 0; pi < pages.length; pi++) {
+      const pno = pages[pi];
+      const pct = 10 + (pi / pages.length) * 85;
+      setProgress(pct, `페이지 ${pno} 변환 중`, `P.${pno} — ${byPage[pno].length}개 치환`);
+
+      const pdfLibPage = pdfDoc.getPage(pno - 1);
+      const items = byPage[pno];
+      let pageChanged = false;
+
+      for (const d of items) {
+        const newNum = calcNew(d.origNum, rate);
+
+        // 숫자 위치 좌표
+        const [x0, y0, x1, y1] = inset(d.numX0, d.y0, d.numX1, d.y1, ERASE_INSET);
+
+        // 1. 기존 숫자 지우기 (흰 사각형)
+        if (x1 > x0 && y1 > y0) {
+          pdfLibPage.drawRectangle({
+            x: x0, y: y0,
+            width: x1 - x0, height: y1 - y0,
+            color: PDFLib.rgb(1,1,1), borderWidth: 0,
+          });
+        }
+
+        // 2. 새 숫자 삽입
+        const newW = font.widthOfTextAtSize(newNum, d.fs);
+        const origW = d.numX1 - d.numX0;
+        const insX  = d.numX0 + Math.max(0, (origW - newW) / 2);
+        try {
+          pdfLibPage.drawText(newNum, {
+            x: insX, y: d.baseline,
+            size: d.fs, font, color: PDFLib.rgb(0,0,0),
+          });
+        } catch(e) { console.warn('삽입 실패:', e.message); }
+
+        replaced++;
+        pageChanged = true;
+      }
+
+      if (pageChanged) changedPages++;
+    }
+
+    setProgress(98, '파일 저장 중...');
+    const resultBytes = await pdfDoc.save();
+    resultBlob = new Blob([resultBytes], { type:'application/pdf' });
+
+    setProgress(100, '완료!');
+    progressWrap.style.display = 'none';
+
+    // 상태 표시
+    statusBox.className = 'status ok';
+    document.getElementById('statusIcon').textContent = '✅';
+    document.getElementById('statusText').textContent =
+      `변환 완료 — ${changedPages}페이지, ${replaced}개 숫자 치환`;
+
+    // 통계
+    document.getElementById('statPages').textContent = changedPages;
+    document.getElementById('statItems').textContent = detectedItems.length;
+    document.getElementById('statDone').textContent  = replaced;
+    statsBox.className = 'stats show';
+
+    dlBtn.style.display = 'block';
+    setStep(4);
+    showToast('ok', `✅ ${replaced}개 숫자 변환 완료`);
+
+  } catch(err) {
+    console.error(err);
+    progressWrap.style.display = 'none';
+    statusBox.className = 'status err';
+    document.getElementById('statusIcon').textContent = '❌';
+    document.getElementById('statusText').textContent = '오류: ' + err.message;
+    showToast('err', '오류: ' + err.message);
+  } finally {
+    convertBtn.disabled = false;
+  }
+});
+
+// ── 다운로드
+dlBtn.addEventListener('click', () => {
+  if (!resultBlob) return;
+  const url = URL.createObjectURL(resultBlob);
+  const a   = document.createElement('a');
+  a.href     = url;
+  a.download = '변환_' + pdfName.replace(/^(원본_?|시상안_?)/, '');
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+});
+
+// ── 토스트
+function showToast(type, msg, dur=4000) {
+  const wrap = document.getElementById('toastWrap');
+  const el   = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(() => {
+    el.style.animation = 'toastOut .3s ease forwards';
+    setTimeout(() => el.remove(), 300);
+  }, dur);
+}
+</script>
+</body>
+</html>
