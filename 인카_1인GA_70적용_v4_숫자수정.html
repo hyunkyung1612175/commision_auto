@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>인카금융서비스 | 1인GA 보험료 70% 적용 시스템</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <style>
+    :root {
+      --navy-deep:  #06101f;
+      --navy:       #0d1b3e;
+      --navy-mid:   #162447;
+      --navy-card:  #111e3a;
+      --gold:       #2C59F4;
+      --gold-lt:    #6b8ff8;
+      --gold-pale:  rgba(44,89,244,0.12);
+      --gold-border:rgba(44,89,244,0.35);
+      --accent-bright: #60C6FF;
+      --white:      #ffffff;
+      --gray-1:     #e8ecf5;
+      --gray-2:     #a8b4cc;
+      --gray-3:     #5a6a88;
+      --line:       rgba(255,255,255,0.07);
+      --success:    #27ae60;
+      --error:      #e74c3c;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--navy-deep);
+      color: var(--white);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── HEADER ───────────────────────────────────────── */
+    .header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(6,16,31,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--gold-border);
+    }
+    .header-inner {
+      max-width: 1120px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 68px; padding: 0 32px;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .logo-mark {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-lt));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Noto Serif KR', serif;
+      font-size: 17px; font-weight: 700;
+      color: var(--white);
+      flex-shrink: 0;
+    }
+    .logo-text-main {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 17px; font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .logo-text-sub {
+      font-size: 10px; font-weight: 400;
+      color: var(--accent-bright);
+      letter-spacing: 0.1em;
+      margin-top: 1px;
+    }
+    .header-dept {
+      text-align: right;
+      padding: 6px 14px;
+      border: 1px solid var(--gold-border);
+      border-radius: 6px;
+      background: var(--gold-pale);
+    }
+    .dept-name   { font-size: 12px; font-weight: 600; color: var(--accent-bright); }
+    .dept-team   { font-size: 11px; color: var(--gray-2); margin-top: 1px; }
+
+    /* ── HERO ─────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(160deg, #0d1f42 0%, var(--navy-deep) 70%);
+      border-bottom: 1px solid var(--line);
+      padding: 64px 32px 56px;
+    }
+    .hero-inner { max-width: 1120px; margin: 0 auto; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--gold-pale);
+      border: 1px solid var(--gold-border);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 11px; font-weight: 600;
+      color: var(--white);
+      letter-spacing: 0.06em;
+      margin-bottom: 22px;
+    }
+    .hero-title {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 38px; font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 14px;
+    }
+    .hero-title .accent { color: var(--accent-bright); }
+    .hero-desc {
+      font-size: 15px; color: var(--gray-2);
+      line-height: 1.8; max-width: 560px;
+      margin-bottom: 36px;
+    }
+    .hero-kpi {
+      display: flex; gap: 0;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      width: fit-content;
+      background: rgba(255,255,255,0.025);
+    }
+    .kpi-item {
+      padding: 16px 32px;
+      border-right: 1px solid var(--line);
+      text-align: center;
+    }
+    .kpi-item:last-child { border-right: none; }
+    .kpi-num {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 26px; font-weight: 700;
+      color: var(--accent-bright);
+    }
+    .kpi-label { font-size: 11px; color: var(--gray-2); margin-top: 3px; }
+
+    /* ── MAIN ─────────────────────────────────────────── */
+    .main { max-width: 1120px; margin: 0 auto; padding: 48px 32px 64px; }
+
+    /* Steps bar */
+    .steps {
+      display: flex;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 40px;
+      background: rgba(255,255,255,0.02);
+    }
+    .step {
+      flex: 1;
+      display: flex; align-items: center; gap: 12px;
+      padding: 18px 22px;
+      border-right: 1px solid var(--line);
+      transition: background 0.3s;
+    }
+    .step:last-child { border-right: none; }
+    .step.active { background: rgba(201,168,76,0.07); }
+    .step-circle {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 1.5px solid var(--gold-border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: var(--gray-2);
+      flex-shrink: 0; transition: all 0.3s;
+    }
+    .step.active .step-circle {
+      background: var(--gold); border-color: var(--gold);
+      color: var(--navy-deep);
+    }
+    .step-label h5 { font-size: 13px; font-weight: 600; color: var(--white); }
+    .step-label p  { font-size: 11px; color: var(--gray-2); margin-top: 2px; }
+
+    /* Card */
+    .card {
+      background: var(--navy-card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+    .card-header {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 28px;
+    }
+    .card-icon {
+      width: 44px; height: 44px;
+      background: var(--gold-pale);
+      border: 1px solid var(--gold-border);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .card-title { font-size: 17px; font-weight: 600; }
+    .card-subtitle { font-size: 12px; color: var(--gray-2); margin-top: 3px; }
+
+    /* Upload grid */
+    .upload-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+      margin-bottom: 4px;
+    }
+    .upload-slot-label {
+      font-size: 13px; font-weight: 600;
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .upload-slot-label .tag {
+      padding: 2px 9px;
+      border-radius: 10px;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .tag-orig  { background: rgba(39,174,96,0.15);  border: 1px solid rgba(39,174,96,0.35);  color: #2ecc71; }
+    .tag-color { background: rgba(241,196,15,0.15); border: 1px solid rgba(241,196,15,0.35); color: #f1c40f; }
+
+    .upload-zone {
+      border: 2px dashed var(--gold-border);
+      border-radius: 12px;
+      padding: 36px 24px;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.25s;
+      min-height: 160px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 8px;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--gold);
+      background: var(--gold-pale);
+    }
+    .upload-zone.filled {
+      border-style: solid;
+      border-color: rgba(39,174,96,0.5);
+      background: rgba(39,174,96,0.05);
+    }
+    .upload-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%;
+    }
+    .uz-icon { font-size: 36px; }
+    .uz-title { font-size: 14px; font-weight: 600; color: var(--gray-1); }
+    .uz-desc  { font-size: 12px; color: var(--gray-2); line-height: 1.5; }
+    .uz-pill  {
+      margin-top: 4px; padding: 3px 10px;
+      border: 1px solid var(--gold-border);
+      border-radius: 10px;
+      font-size: 11px; color: var(--gold);
+    }
+    .uz-filename {
+      font-size: 13px; font-weight: 600; color: var(--white);
+      max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .uz-size { font-size: 11px; color: var(--gray-2); }
+
+    /* Settings */
+    .settings-bar {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 16px;
+      margin-bottom: 28px;
+    }
+    .setting-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .setting-lbl { font-size: 11px; color: var(--gray-2); font-weight: 500; letter-spacing: 0.04em; margin-bottom: 6px; }
+    .setting-val { font-family: 'Noto Serif KR', serif; font-size: 20px; font-weight: 700; color: var(--gold); }
+    .setting-hint { font-size: 11px; color: var(--gray-3); margin-top: 4px; }
+
+    /* Process button */
+    .btn-process {
+      width: 100%; padding: 17px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-lt));
+      color: var(--white);
+      border: none; border-radius: 12px;
+      font-size: 16px; font-weight: 700;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer; letter-spacing: 0.02em;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: all 0.25s;
+    }
+    .btn-process:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(44,89,244,0.4);
+    }
+    .btn-process:active:not(:disabled) { transform: translateY(0); }
+    .btn-process:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* Reset button */
+    .btn-reset {
+      width: 100%; padding: 13px;
+      background: transparent;
+      color: var(--gray-2);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      font-size: 14px; font-weight: 600;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer; letter-spacing: 0.02em;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.25s;
+      margin-top: 10px;
+    }
+    .btn-reset:hover {
+      border-color: rgba(231,76,60,0.45);
+      color: #e74c3c;
+      background: rgba(231,76,60,0.06);
+    }
+
+    /* Progress */
+    .progress-wrap { display: none; margin-top: 22px; }
+    .progress-wrap.show { display: block; }
+    .progress-track {
+      height: 5px; background: rgba(255,255,255,0.08);
+      border-radius: 3px; overflow: hidden; margin-bottom: 12px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--gold-lt));
+      border-radius: 3px; width: 0%;
+      transition: width 0.5s ease;
+    }
+    .progress-status { font-size: 13px; color: var(--gray-2); text-align: center; }
+
+    /* Error */
+    .error-box {
+      display: none; margin-top: 16px;
+      padding: 13px 16px;
+      background: rgba(231,76,60,0.12);
+      border: 1px solid rgba(231,76,60,0.35);
+      border-radius: 8px;
+      font-size: 13px; color: #e74c3c;
+    }
+    .error-box.show { display: block; }
+
+    /* Result */
+    .result-wrap { display: none; margin-top: 24px; }
+    .result-wrap.show { display: block; animation: fadeUp 0.4s ease; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-card {
+      background: linear-gradient(135deg, rgba(39,174,96,0.12), rgba(39,174,96,0.04));
+      border: 1px solid rgba(39,174,96,0.35);
+      border-radius: 14px;
+      padding: 32px;
+      text-align: center;
+    }
+    .result-icon { font-size: 44px; margin-bottom: 10px; }
+    .result-title { font-size: 20px; font-weight: 700; margin-bottom: 5px; }
+    .result-desc { font-size: 13px; color: var(--gray-2); margin-bottom: 24px; }
+    .result-stats {
+      display: flex; justify-content: center; gap: 40px; margin-bottom: 24px;
+    }
+    .rs-num { font-family: 'Noto Serif KR', serif; font-size: 28px; font-weight: 700; color: var(--gold); }
+    .rs-lbl { font-size: 12px; color: var(--gray-2); margin-top: 3px; }
+
+    .btn-dl {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 36px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-lt));
+      color: var(--white);
+      border: none; border-radius: 10px;
+      font-size: 15px; font-weight: 700;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer; text-decoration: none;
+      transition: all 0.25s;
+    }
+    .btn-dl:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(44,89,244,0.4);
+    }
+
+    /* Info cards */
+    .info-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 8px; }
+    .info-box {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 22px;
+    }
+    .info-box-icon { font-size: 22px; margin-bottom: 10px; }
+    .info-box-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+    .info-box-desc  { font-size: 12px; color: var(--gray-2); line-height: 1.7; }
+
+    /* How-to box */
+    .howto {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 24px;
+    }
+    .howto h4 { font-size: 14px; font-weight: 600; color: var(--accent-bright); margin-bottom: 14px; }
+    .howto ol { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .howto li {
+      display: flex; align-items: flex-start; gap: 12px;
+      font-size: 13px; color: var(--gray-2); line-height: 1.6;
+    }
+    .howto-n {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--gold-pale); border: 1px solid var(--gold-border);
+      font-size: 11px; font-weight: 700; color: var(--accent-bright);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 24px 32px;
+    }
+    .footer-inner {
+      max-width: 1120px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer-logo { display: flex; align-items: center; gap: 10px; }
+    .footer-logo-mark {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-lt));
+      border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: var(--white);
+    }
+    .footer-logo-text { font-size: 12px; color: var(--gray-2); }
+    .footer-right { font-size: 11px; color: var(--gray-3); text-align: right; }
+
+    /* Divider */
+    .divider { border: none; border-top: 1px solid var(--line); margin: 8px 0 24px; }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ──────────────────────────────────────────── -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-mark">인</div>
+      <div>
+        <div class="logo-text-main">인카금융서비스</div>
+        <div class="logo-text-sub">Think !&nbsp;&nbsp; Why ?&nbsp;&nbsp; How ?</div>
+      </div>
+    </div>
+    <div class="header-dept">
+      <div class="dept-name">제도관리부</div>
+      <div class="dept-team">생보관리팀</div>
+    </div>
+  </div>
+</header>
+
+<!-- ── HERO ────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">⚡ 1인 GA 전용 자동화 시스템</div>
+    <h1 class="hero-title">
+      보험료 <span class="accent">70% 요율</span><br>자동 적용 시스템
+    </h1>
+    <p class="hero-desc">
+      하이라이트된 PDF 보험료 수치에 70% 요율을 자동 적용합니다.<br>
+      원본 PDF와 색칠(하이라이트) PDF를 업로드하면 즉시 처리됩니다.
+    </p>
+    <div class="hero-kpi">
+      <div class="kpi-item">
+        <div class="kpi-num">70%</div>
+        <div class="kpi-label">적용 요율</div>
+      </div>
+      <div class="kpi-item">
+        <div class="kpi-num">절사</div>
+        <div class="kpi-label">소수점 처리</div>
+      </div>
+      <div class="kpi-item">
+        <div class="kpi-num">PDF</div>
+        <div class="kpi-label">출력 형식</div>
+      </div>
+      <div class="kpi-item">
+        <div class="kpi-num">보안</div>
+        <div class="kpi-label">로컬 처리</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MAIN ────────────────────────────────────────────── -->
+<main class="main">
+
+  <!-- Steps -->
+  <div class="steps">
+    <div class="step active" id="step1">
+      <div class="step-circle">1</div>
+      <div class="step-label">
+        <h5>PDF 업로드</h5>
+        <p>원본 &amp; 색칠 파일 선택</p>
+      </div>
+    </div>
+    <div class="step" id="step2">
+      <div class="step-circle">2</div>
+      <div class="step-label">
+        <h5>자동 처리</h5>
+        <p>하이라이트 영역 70% 적용</p>
+      </div>
+    </div>
+    <div class="step" id="step3">
+      <div class="step-circle">3</div>
+      <div class="step-label">
+        <h5>다운로드</h5>
+        <p>결과 PDF 저장</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- How-to -->
+  <div class="howto">
+    <h4>📌 사용 방법</h4>
+    <ol>
+      <li><span class="howto-n">1</span><span><b style="color:#fff">원본 PDF</b>: 보험료가 수록된 원본 테이블 PDF 파일 (수정 대상)</span></li>
+      <li><span class="howto-n">2</span><span><b style="color:#fff">색칠 PDF</b>: 변환할 숫자에 형광펜(Highlight)이 표시된 PDF 파일 (표시 기준)</span></li>
+      <li><span class="howto-n">3</span><span>두 파일 모두 업로드 후 <b style="color:#60C6FF">70% 자동 적용</b> 버튼 클릭</span></li>
+      <li><span class="howto-n">4</span><span>처리 완료 후 <b style="color:#60C6FF">결과_원본.pdf</b> 파일 다운로드</span></li>
+    </ol>
+  </div>
+
+  <!-- Upload Card -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">📂</div>
+      <div>
+        <div class="card-title">PDF 파일 업로드</div>
+        <div class="card-subtitle">두 파일의 페이지 구성이 동일해야 합니다</div>
+      </div>
+    </div>
+
+    <div class="upload-grid">
+      <!-- Orig PDF -->
+      <div>
+        <div class="upload-slot-label">
+          원본 PDF
+          <span class="tag tag-orig">ORIGINAL</span>
+        </div>
+        <div class="upload-zone" id="origZone">
+          <input type="file" id="origInput" accept=".pdf">
+          <div class="uz-icon">📄</div>
+          <div class="uz-title">원본 PDF 선택</div>
+          <div class="uz-desc">보험료 수치가 있는<br>원본 파일</div>
+          <div class="uz-pill">📎 PDF 파일</div>
+        </div>
+      </div>
+
+      <!-- Color PDF -->
+      <div>
+        <div class="upload-slot-label">
+          색칠 PDF
+          <span class="tag tag-color">HIGHLIGHT</span>
+        </div>
+        <div class="upload-zone" id="colorZone">
+          <input type="file" id="colorInput" accept=".pdf">
+          <div class="uz-icon">🖊️</div>
+          <div class="uz-title">색칠 PDF 선택</div>
+          <div class="uz-desc">형광펜 표시가 된<br>하이라이트 파일</div>
+          <div class="uz-pill">📎 PDF 파일</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings + Process Card -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">⚙️</div>
+      <div>
+        <div class="card-title">요율 적용 설정</div>
+        <div class="card-subtitle">1인 GA 기준 고정값 — 변경 불가</div>
+      </div>
+    </div>
+
+    <div class="settings-bar">
+      <div class="setting-box">
+        <div class="setting-lbl">적용 요율</div>
+        <div class="setting-val">70%</div>
+        <div class="setting-hint">보험료 × 0.7</div>
+      </div>
+      <div class="setting-box">
+        <div class="setting-lbl">소수점 처리</div>
+        <div class="setting-val">절사</div>
+        <div class="setting-hint">Floor (1원 미만)</div>
+      </div>
+      <div class="setting-box">
+        <div class="setting-lbl">적용 기준</div>
+        <div class="setting-val">Highlight</div>
+        <div class="setting-hint">형광펜 영역 내 숫자</div>
+      </div>
+      <div class="setting-box">
+        <div class="setting-lbl">출력 파일명</div>
+        <div class="setting-val" style="font-size:14px;padding-top:3px">결과_원본명</div>
+        <div class="setting-hint">원본 파일명 앞에 결과_ 추가</div>
+      </div>
+    </div>
+
+    <button class="btn-process" id="processBtn" disabled>
+      <span>⚡</span>
+      <span>70% 요율 자동 적용 시작</span>
+    </button>
+
+    <button class="btn-reset" id="resetBtn">
+      <span>🔄</span>
+      <span>초기화 (파일 및 결과 리셋)</span>
+    </button>
+
+    <!-- Progress -->
+    <div class="progress-wrap" id="progressWrap">
+      <div style="margin-top:22px">
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-status" id="progressStatus">처리 준비 중...</div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div class="error-box" id="errorBox">오류가 발생했습니다.</div>
+
+    <!-- Result -->
+    <div class="result-wrap" id="resultWrap">
+      <div class="result-card">
+        <div class="result-icon">✅</div>
+        <div class="result-title">처리 완료!</div>
+        <div class="result-desc">하이라이트 영역의 보험료에 70% 요율이 성공적으로 적용되었습니다.</div>
+        <div class="result-stats">
+          <div>
+            <div class="rs-num" id="rsCount">0</div>
+            <div class="rs-lbl">처리된 수치 건수</div>
+          </div>
+          <div>
+            <div class="rs-num" id="rsPages">0</div>
+            <div class="rs-lbl">처리된 페이지</div>
+          </div>
+          <div>
+            <div class="rs-num" id="rsHighlights">0</div>
+            <div class="rs-lbl">하이라이트 영역</div>
+          </div>
+        </div>
+        <a id="dlLink" class="btn-dl">
+          <span>⬇️</span>
+          <span>결과 PDF 다운로드</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info -->
+  <div class="info-row">
+    <div class="info-box">
+      <div class="info-box-icon">🔒</div>
+      <div class="info-box-title">완전한 로컬 처리</div>
+      <div class="info-box-desc">모든 파일 처리는 브라우저 내에서 진행됩니다. 서버로 파일이 전송되지 않아 보안이 유지됩니다.</div>
+    </div>
+    <div class="info-box">
+      <div class="info-box-icon">🌐</div>
+      <div class="info-box-title">어디서나 사용 가능</div>
+      <div class="info-box-desc">GitHub Pages에 호스팅되어 별도 설치 없이 모든 PC와 모바일 브라우저에서 즉시 사용 가능합니다.</div>
+    </div>
+    <div class="info-box">
+      <div class="info-box-icon">📐</div>
+      <div class="info-box-title">원본 형식 유지</div>
+      <div class="info-box-desc">PDF 레이아웃, 폰트, 표 구조를 그대로 유지하며 해당 숫자 값만 정밀하게 교체합니다.</div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── FOOTER ──────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <div class="footer-logo-mark">인</div>
+      <div class="footer-logo-text">인카금융서비스</div>
+    </div>
+    <div class="footer-right">
+      제도관리부 생보관리팀<br>
+      내부 업무용 시스템 — 외부 배포 금지
+    </div>
+  </div>
+</footer>
+
+<!-- ── SCRIPT ──────────────────────────────────────────── -->
+<script>
+"use strict";
+
+// ──────────────────────────────────────────────────────────
+// PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ──────────────────────────────────────────────────────────
+// State
+let origFile  = null;
+let colorFile = null;
+
+// ──────────────────────────────────────────────────────────
+// DOM helpers
+const $ = id => document.getElementById(id);
+
+function setProgress(pct, msg) {
+  $('progressFill').style.width = pct + '%';
+  $('progressStatus').textContent = msg;
+}
+
+function setStep(n) {
+  [1,2,3].forEach(i => {
+    const el = $('step' + i);
+    if (i === n) el.classList.add('active');
+    else         el.classList.remove('active');
+  });
+}
+
+function showError(msg) {
+  const el = $('errorBox');
+  el.textContent = '⚠️ ' + msg;
+  el.classList.add('show');
+}
+
+function hideError() { $('errorBox').classList.remove('show'); }
+
+function checkReady() {
+  $('processBtn').disabled = !(origFile && colorFile);
+  if (origFile && colorFile) setStep(2);
+}
+
+// ──────────────────────────────────────────────────────────
+// Upload zone setup
+function setupZone(zoneId, inputId, tag) {
+  const zone  = $(zoneId);
+  const input = $(inputId);
+  let fileRef = null;
+
+  function handleFile(file) {
+    if (!file || !file.name.toLowerCase().endsWith('.pdf')) {
+      showError('PDF 파일만 업로드할 수 있습니다.');
+      return;
+    }
+    fileRef = file;
+    if (tag === 'orig')  origFile  = file;
+    if (tag === 'color') colorFile = file;
+
+    zone.classList.add('filled');
+    zone.innerHTML = `
+      <div class="uz-icon">✅</div>
+      <div class="uz-filename">${file.name}</div>
+      <div class="uz-size">${(file.size/1024).toFixed(1)} KB</div>
+      <div class="uz-pill" style="border-color:rgba(39,174,96,0.4);color:#2ecc71">업로드 완료</div>
+    `;
+    // Re-create hidden input so user can re-select
+    const newInput = document.createElement('input');
+    newInput.type = 'file'; newInput.accept = '.pdf';
+    newInput.style.cssText = 'position:absolute;inset:0;opacity:0;cursor:pointer;width:100%';
+    newInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+    zone.appendChild(newInput);
+
+    hideError();
+    checkReady();
+  }
+
+  input.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+  zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  });
+}
+
+setupZone('origZone',  'origInput',  'orig');
+setupZone('colorZone', 'colorInput', 'color');
+
+// ──────────────────────────────────────────────────────────
+// Number utilities
+const NUM_RE = /(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?/g;
+
+function calcFloor70(numStr) {
+  const raw = parseFloat(numStr.replace(/,/g, ''));
+  if (isNaN(raw) || raw <= 0) return null;
+  const result = Math.floor(raw * 0.7);
+  return result;
+}
+
+function formatKorean(n) {
+  // Same as original: toLocaleString with comma separation
+  return n.toLocaleString('ko-KR');
+}
+
+// ──────────────────────────────────────────────────────────
+// 유니코드 문자 클래스별 실측 advance 비율 기반 위치 계산
+// MalgunGothic @ 9.96pt 실측값으로 검증됨:
+//   한글음절 0.880 | 숫자 0.434 | 공백 0.241 | % 0.723 | 대문자 0.494
+function getCharPositions(str, itemWidth) {
+  function advRatio(ch) {
+    const c = ch.charCodeAt(0);
+    if (c === 0x20 || c === 0xA0) return 0.241;         // 공백
+    if (c === 0x25) return 0.723;                        // %
+    if (c >= 0x30 && c <= 0x39) return 0.434;           // 숫자 0-9
+    if (c >= 0x41 && c <= 0x5A) return 0.494;           // 대문자 A-Z
+    if (c >= 0x61 && c <= 0x7A) return 0.460;           // 소문자 a-z
+    if (c >= 0xAC00 && c <= 0xD7A3) return 0.880;       // 한글 음절
+    if (c >= 0x1100 && c <= 0x11FF) return 0.880;       // 한글 자모
+    if (c >= 0x3130 && c <= 0x318F) return 0.880;       // 한글 호환 자모
+    if (c >= 0x4E00 && c <= 0x9FFF) return 0.880;       // CJK
+    if (c >= 0xFF00 && c <= 0xFFEF) return 0.880;       // 전각
+    return 0.440; // 기타 ASCII 기호
+  }
+  let totalRatio = 0;
+  for (const ch of str) totalRatio += advRatio(ch);
+  if (totalRatio <= 0 || itemWidth <= 0) {
+    const w = itemWidth / Math.max(str.length, 1);
+    return Array.from({ length: str.length + 1 }, (_, i) => i * w);
+  }
+  const scale = itemWidth / totalRatio;
+  const pos = [0];
+  let x = 0;
+  for (const ch of str) { x += advRatio(ch) * scale; pos.push(x); }
+  return pos;
+}
+
+// ──────────────────────────────────────────────────────────
+// Rect helpers
+function rectsOverlap(ax0, ay0, ax1, ay1, bx0, by0, bx1, by1, pad = 4) {
+  return ax0 < bx1 + pad && ax1 > bx0 - pad &&
+         ay0 < by1 + pad && ay1 > by0 - pad;
+}
+
+// ──────────────────────────────────────────────────────────
+// Main processing
+$('processBtn').addEventListener('click', processPDFs);
+
+// ──────────────────────────────────────────────────────────
+// Reset
+$('resetBtn').addEventListener('click', resetAll);
+
+function resetAll() {
+  // Clear state
+  origFile  = null;
+  colorFile = null;
+
+  // Reset upload zones
+  function resetZone(zoneId, inputId, iconText, titleText, descHtml, pillText) {
+    const zone = $(zoneId);
+    zone.classList.remove('filled', 'drag-over');
+    zone.innerHTML = `
+      <input type="file" id="${inputId}" accept=".pdf">
+      <div class="uz-icon">${iconText}</div>
+      <div class="uz-title">${titleText}</div>
+      <div class="uz-desc">${descHtml}</div>
+      <div class="uz-pill">📎 PDF 파일</div>
+    `;
+    setupZone(zoneId, inputId, zoneId === 'origZone' ? 'orig' : 'color');
+  }
+
+  resetZone('origZone',  'origInput',  '📄', '원본 PDF 선택',  '보험료 수치가 있는<br>원본 파일', '');
+  resetZone('colorZone', 'colorInput', '🖊️', '색칠 PDF 선택', '형광펜 표시가 된<br>하이라이트 파일', '');
+
+  // Reset UI state
+  $('processBtn').disabled = true;
+  $('progressWrap').classList.remove('show');
+  $('resultWrap').classList.remove('show');
+  $('progressFill').style.width = '0%';
+  $('progressStatus').textContent = '처리 준비 중...';
+  hideError();
+  setStep(1);
+}
+
+async function processPDFs() {
+  if (!origFile || !colorFile) return;
+
+  $('processBtn').disabled = true;
+  hideError();
+  $('progressWrap').classList.add('show');
+  $('resultWrap').classList.remove('show');
+
+  try {
+    setProgress(5, 'PDF 파일 로딩 중...');
+
+    const [origBuf, colorBuf] = await Promise.all([
+      origFile.arrayBuffer(),
+      colorFile.arrayBuffer(),
+    ]);
+
+    setProgress(12, '원본 PDF 분석 중...');
+    const origPdfJs = await pdfjsLib.getDocument({ data: origBuf.slice(0) }).promise;
+
+    setProgress(20, '색칠 PDF 분석 중...');
+    const colorPdfJs = await pdfjsLib.getDocument({ data: colorBuf.slice(0) }).promise;
+
+    setProgress(28, 'PDF 편집 모드 초기화...');
+    const pdfLib = await PDFLib.PDFDocument.load(origBuf);
+
+    const helvetica = await pdfLib.embedFont(PDFLib.StandardFonts.Helvetica);
+
+    const numPages       = origPdfJs.numPages;
+    let totalReplaced    = 0;
+    let pagesChanged     = 0;
+    let totalHighlights  = 0;
+
+    for (let pg = 1; pg <= numPages; pg++) {
+      const pct = 28 + Math.round((pg / numPages) * 62);
+      setProgress(pct, `페이지 ${pg} / ${numPages} 처리 중...`);
+
+      // ── Get highlight rects from color PDF ──
+      const colorPage  = await colorPdfJs.getPage(pg);
+      const annotations = await colorPage.getAnnotations();
+      const highlights  = annotations.filter(a =>
+        a.subtype === 'Highlight' || a.subtype === 'highlight'
+      );
+
+      if (highlights.length === 0) continue;
+      totalHighlights += highlights.length;
+
+      // Build list of highlight rects in PDF user-space (bottom-left origin)
+      const hRects = [];
+      for (const hl of highlights) {
+        if (hl.quadPoints && hl.quadPoints.length >= 8) {
+          for (let i = 0; i < hl.quadPoints.length; i += 8) {
+            const qp = hl.quadPoints.slice(i, i + 8);
+            const xs = [qp[0], qp[2], qp[4], qp[6]];
+            const ys = [qp[1], qp[3], qp[5], qp[7]];
+            hRects.push({
+              x0: Math.min(...xs), y0: Math.min(...ys),
+              x1: Math.max(...xs), y1: Math.max(...ys)
+            });
+          }
+        } else if (hl.rect) {
+          hRects.push({
+            x0: hl.rect[0], y0: hl.rect[1],
+            x1: hl.rect[2], y1: hl.rect[3]
+          });
+        }
+      }
+
+      if (hRects.length === 0) continue;
+
+      // ── Get text from original PDF ──
+      const origPage   = await origPdfJs.getPage(pg);
+      const textContent = await origPage.getTextContent({ disableCombineTextItems: true });
+      const pdfLibPage  = pdfLib.getPage(pg - 1);
+
+      let pageReplaced = 0;
+
+      for (const item of textContent.items) {
+        if (!item.str || item.str.trim() === '') continue;
+
+        // PDF.js text transform: [a, b, c, d, tx, ty]
+        // tx, ty = position of the text's origin in PDF user-space
+        const tx = item.transform[4];
+        const ty = item.transform[5];
+
+        // Font size from transform matrix
+        const scaleY   = item.transform[3];
+        const scaleX   = item.transform[0];
+        const fontSize = Math.abs(scaleY) > 0.5 ? Math.abs(scaleY) : Math.abs(scaleX);
+        if (fontSize < 1) continue;
+
+        const itemW = item.width || (item.str.length * fontSize * 0.55);
+        const ascent  =  fontSize * 0.85;
+        const descent = -fontSize * 0.2;
+
+        // Item bounding box in PDF user-space
+        const itemX0 = tx;
+        const itemY0 = ty + descent;
+        const itemX1 = tx + itemW;
+        const itemY1 = ty + ascent;
+
+        // Check if this item overlaps any highlight rect
+        const inHighlight = hRects.some(hr =>
+          rectsOverlap(itemX0, itemY0, itemX1, itemY1, hr.x0, hr.y0, hr.x1, hr.y1)
+        );
+        if (!inHighlight) continue;
+
+        // ── Find and replace numbers in this item ──
+        // Collect matches first, then process in reverse order to avoid index shift
+        const matches = [];
+        NUM_RE.lastIndex = 0;
+        let m;
+        while ((m = NUM_RE.exec(item.str)) !== null) {
+          const newVal = calcFloor70(m[0]);
+          if (newVal === null) continue;
+          const newStr = formatKorean(newVal);
+          if (newStr === m[0].replace(/,/g, '') || newStr === m[0]) {
+            // Value unchanged — still replace for consistent formatting
+          }
+          matches.push({ index: m.index, old: m[0], newStr, newVal });
+        }
+
+        if (matches.length === 0) continue;
+
+        // 유니코드 문자 클래스 기반 정밀 위치 계산 (한글·숫자 혼재 대응)
+        const charPos = getCharPositions(item.str, itemW);
+
+        for (const match of matches) {
+          // 숫자 시작 x 좌표 (unicode-aware 오프셋)
+          const xOffset  = charPos[match.index];
+          const numX     = tx + xOffset;
+          // 기존 숫자 폭 (실측 advance 비율 기반)
+          const oldWidth = charPos[match.index + match.old.length] - charPos[match.index];
+
+          // 신규 숫자 폭 (Helvetica 폰트 메트릭)
+          const newWidth = helvetica.widthOfTextAtSize(match.newStr, fontSize);
+
+          // 기존 숫자 완전 덮기 (패딩 충분히)
+          pdfLibPage.drawRectangle({
+            x:      numX - 2,
+            y:      ty + descent - 2,
+            width:  Math.max(oldWidth, newWidth) + 8,
+            height: fontSize * 1.2 + 4,
+            color:  PDFLib.rgb(1, 1, 1),
+            borderWidth: 0,
+          });
+
+          // 새 숫자 삽입
+          pdfLibPage.drawText(match.newStr, {
+            x:    numX,
+            y:    ty,
+            size: fontSize,
+            font: helvetica,
+            color: PDFLib.rgb(0, 0, 0),
+          });
+
+          pageReplaced++;
+          totalReplaced++;
+        }
+      }
+
+      if (pageReplaced > 0) pagesChanged++;
+    }
+
+    // ── Save ──
+    setProgress(93, '결과 PDF 생성 중...');
+    const resultBytes = await pdfLib.save();
+
+    setProgress(100, '완료!');
+
+    // ── Create download link ──
+    const blob = new Blob([resultBytes], { type: 'application/pdf' });
+    const url  = URL.createObjectURL(blob);
+    const baseName = origFile.name.replace(/\.pdf$/i, '');
+    const dlName   = `결과_${baseName}.pdf`;
+
+    const dl = $('dlLink');
+    dl.href     = url;
+    dl.download = dlName;
+
+    $('rsCount').textContent      = totalReplaced.toLocaleString();
+    $('rsPages').textContent      = pagesChanged.toLocaleString();
+    $('rsHighlights').textContent = totalHighlights.toLocaleString();
+
+    setTimeout(() => {
+      $('progressWrap').classList.remove('show');
+      $('resultWrap').classList.add('show');
+      setStep(3);
+    }, 400);
+
+  } catch (err) {
+    console.error(err);
+    showError(`처리 중 오류가 발생했습니다: ${err.message}`);
+    $('progressWrap').classList.remove('show');
+  } finally {
+    $('processBtn').disabled = false;
+  }
+}
+</script>
+</body>
+</html>
